@@ -1,0 +1,26 @@
+# Dependencies (never commit these)
+node_modules/
+bower_components/
+
+# Environment variables and secrets
+.env
+.env.local
+.env.production
+*.pem
+*.key
+
+# Operating system files
+.DS_Store
+Thumbs.db
+
+# Build outputs and logs
+dist/
+build/
+*.log
+npm-debug.log*
+
+# IDE and Editor configs
+.vscode/
+.idea/
+*.suo
+*.ntvs*
