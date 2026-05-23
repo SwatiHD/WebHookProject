@@ -35,13 +35,13 @@ In this Project:
 
 So we have two backend system 
 1. Sender
-    creates orders
-    stores them in MongoDB
-    sends webhook events
+    -creates orders
+    -stores them in MongoDB
+    -sends webhook events
 2. Reciever
-    receives webhook requests
-    verifies they are authentic
-    accepts or rejects them
+    -receives webhook requests
+    -verifies they are authentic
+    -accepts or rejects them
 
 Here's the entire flow of the systems
 
