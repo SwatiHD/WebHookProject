@@ -76,7 +76,7 @@ app.listen(PORT, () => {
   console.log(`Sender running on port ${PORT}`);
 });
 ```
-Before the Sender App receives the HTTP request(order) we set up the Express framework, MongoDB must be connected, routes must be registered. Here, sender server basically gets ready and waits for the request. In our example, its the warehouse waitin for the order request.
+Before the Sender App receives the HTTP request(order) we set up the Express framework, MongoDB must be connected, routes must be registered. Here, sender server basically gets ready and waits for the request. In our example, its the warehouse waiting for the order request.
 
 
 ```python
