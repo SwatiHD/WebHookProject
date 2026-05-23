@@ -5,7 +5,7 @@ That's the first question I had when I first read it.
 I checked on the internet for the meaning.
 And it said, "An automated, event-driven method for one application to send real-time data to another". 
 Now the real question is - Did you understand what that meant?
-Yes, even I felt it like technically deep.
+Yes, even I felt it like it's technically deep.
 
 That's when I decided to build one!
 This project is the result of that.
@@ -27,11 +27,11 @@ Instead, the online store should send the notification to the warehouse team aut
 That automatic notification is nothing but the WEBHOOK!!
 Simple right??
 
-So, A webhook is an HTTP request sent from one system to another when an event is trigerred.
+So, A webhook is an HTTP request sent from one system to another when an event is triggerred.
 
 In this Project:
-#Sender creates Orders
-#Reciever gets the notification about the order
+#Sender: creates Orders
+#Reciever: gets the notification about the order
 
 So we have two backend system 
 1. Sender
@@ -47,7 +47,7 @@ Here's the entire flow of the systems
 
 ![Full Flow](Workflow.png)
 
-Simple concept. But there are lot of interesting things happening inside.
+It's seems simple. But there are lot of interesting things happening inside.
 
 Let's dive into the code.
 
@@ -76,7 +76,7 @@ app.listen(PORT, () => {
   console.log(`Sender running on port ${PORT}`);
 });
 ```
-Before the Sender App receives the HTTP request(order) we set up the Express framework, MongoDB must be connected, routes must be registered. Here, sender sever basically gets ready and waits for the request.
+Before the Sender App receives the HTTP request(order) we set up the Express framework, MongoDB must be connected, routes must be registered. Here, sender server basically gets ready and waits for the request. In our example, its the warehouse waitin for the order request.
 
 
 ```python
@@ -110,16 +110,20 @@ router.post("/orders", async (req, res) => {
 export default router;
 ```
 
-When we make a POST /order request from Postman, the path is matched with the router.post("/order") and the db values are extracted from req.body and document is created and saved in MongoDB.
+When we make a POST /order request from Postman,and if the path is matched with the    ```python
+router.post("/order")
+```, the db values are extracted from req.body and document is created and saved in MongoDB.
 
 Here the router solves a huge problem:
-Without routes the sender server exists but its of no use.So, ain't we solving a problem by
+Without routes the Sender server exists but it's of no use.So, ain't we solving a problem by
 -accepting orders
 -saving the orders
 -trigerring the notifications
 here?
 
-Right after saving the order data, the webhook concept starts when the control flow goes to the line sendWebhook(newOrder); This tells the reciever App that the new order is created.
+Yes, Right after saving the order data, the webhook concept starts when the control flow goes to the line ```python
+sendWebhook(newOrder);
+``` This tells the reciever App, that the new order is created.
 
 Thus, we are here with the most important concept HMAC.
 
@@ -198,7 +202,7 @@ function generateSignature(timestamp, body) {
   return crypto.createHmac("sha256", SECRET).update(payload).digest("hex");
 }
 ```
-We process the payload and get the HMAC authenticated signature.
+We process the payload with timestamp and order data and get back HMAC authenticated signature.
 HMAC is like the Cofee Machine and Signature is its end product that is the Coffee itself!!!
 So, now we have our rawdata, timestamp and signature.
 We send all these to the recievers address, just like the ingredients we gather before we cook.
@@ -210,8 +214,8 @@ Finding it interesting????.....
 
 Okay, lets move to the final part. You are just there!!
 
-Before that, lets see: what if the webhook reuqest failes?
-We know the network issues, server crash,Connections timeout..so what do we do??
+Before that, lets see: what if the webhook request fails?
+We know the network issues, server crash,Connections timeout that creates failure in request-response cycle..so what do we do??
 No worries. We have the solution below:
 
 ```python
@@ -230,11 +234,11 @@ No worries. We have the solution below:
     }
 ```
 So, we have retries.
-The webhook request retries after failed deliveries after 1 second, 3 seconds, 9 seconds and make it work. 
+The webhook request retries the failed deliveries after 1 second, 3 seconds, 9 seconds and make it work. 
 
 As we discussed, diving onto the Reciever App.
 Reciever App runs on : http://localhost:5000
-Its job is simple, check the incoming requests are genuine.
+Its job is simple, check if the incoming requests are genuine.
 
 ```python
 import express from "express";
@@ -277,7 +281,7 @@ router.post(
         });
       }
 ```
-When the router.post("/webhook") matches the incoming webhook request, the Reciever extracts the meta data sent by the Sender. Before verification it checks if signature and timestamp are existing in headers. 
+When the router.post("/webhook") matches the incoming webhook request, the Reciever extracts the meta data sent by the Sender. Before verification it checks if signature and timestamp are existing in headers. If its present, goes to next step, otherwise returns missing message.
 
 ```python
       const payload = `${timestamp}.${rawBody}`;
@@ -308,7 +312,11 @@ When the router.post("/webhook") matches the incoming webhook request, the Recie
   },
 );
 ```
-Now, the Reciever recreates the same payload like the Sender used because both Sender and Reciever should create signature from identical data otherwise verification fails. With that we create its own signature version from same data using HMAC as we discussed before. 
+Now, the Reciever recreates the same payload like the Sender used because both Sender and Reciever should create signature from identical data otherwise verification fails.Because for different data the signature changes internally. With that we create Reciever's own signature version from same data using HMAC as we discussed before. 
 
-So we then compare the signature coming from Sender with that of the Reciever, if it differs the webhook fails otherwise ITS SUCCESSFULL!!!!!
-Thus, we know the order created by Sender was valid and genuine.
+We then compare the signature coming from Sender with that of the Reciever, if it differs the webhook fails otherwise ITS SUCCESSFULL!!!!!
+Thus, we know the order created by Sender is valid and genuine. And Warehouse can proceed with the delivery of the order.
+
+The final flow:
+![Full Flow](FullFlow.png)
+
