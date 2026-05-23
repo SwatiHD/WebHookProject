@@ -5,7 +5,7 @@ That's the first question I had when I first read it.
 I checked on the internet for the meaning.
 And it said, "An automated, event-driven method for one application to send real-time data to another". 
 Now the real question is - Did you understand what that meant?
-Yes, even I felt it like it's technically deep.
+Yes, even I felt like it's technically deep.
 
 That's when I decided to build one!
 This project is the result of that.
