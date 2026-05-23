@@ -176,12 +176,139 @@ export default sendWebhook;
 ```
 So, by now we know, Sender sends the notification to the Reciever. But, what if it's a fake webhook request?? 
 How will the reciever know:
--Who sent the reuqest?
+-Who sent the request?
 -Is the payload modified?
 -if someone forged the request?
 This is where HMAC authentication steps in.
 
 HMAC (Hash-Based Message Authentication Code) is a cryptographic technique that ensures data integrity and authenticity using a hash function and a secret key. The cryptographic hash function may be MD-5, SHA-1, or SHA-256.
 
-HMACs provides Sender and Reciever with a shared private key that is known only to them. When the Sender requests the Reciever, it hashes the requested data with the private key and sends it along the request. When the Sender receives the request, it makes its own HMAC. Both the HMACS are compared and if both are equal, the Sender is said to be genuine. 
+HMACs provides Sender and Reciever with a shared secret key that is known only to them. When the Sender requests the Reciever, it hashes the requested data with the secret key and sends it along the request. When the Sender receives the request, it makes its own HMAC. Both the HMACS are compared and if both are equal, the Sender is said to be genuine. 
 
+```python
+const RECEIVER_URL = "http://localhost:5000/webhook";
+```
+this is the reciever address where webhook events are delivered.
+
+
+```python
+function generateSignature(timestamp, body) {
+  const payload = `${timestamp}.${body}`;
+
+  return crypto.createHmac("sha256", SECRET).update(payload).digest("hex");
+}
+```
+We process the payload and get the HMAC authenticated signature.
+HMAC is like the Cofee Machine and Signature is its end product that is the Coffee itself!!!
+So, now we have our rawdata, timestamp and signature.
+We send all these to the recievers address, just like the ingredients we gather before we cook.
+
+Did you realize we just finished our Sender side process?!
+That was quick than I actually thought it to be. Quicker to learn and quicker to write as well...
+
+Finding it interesting????.....
+
+Okay, lets move to the final part. You are just there!!
+
+Before that, lets see: what if the webhook reuqest failes?
+We know the network issues, server crash,Connections timeout..so what do we do??
+No worries. We have the solution below:
+
+```python
+ if (retryCount < 3) {
+      const delays = [1000, 3000, 9000];
+
+      const delay = delays[retryCount];
+
+      console.log(`Retrying in ${delay / 1000} seconds`);
+
+      setTimeout(() => {
+        sendWebhook(orderData, retryCount + 1);
+      }, delay);
+    } else {
+      console.log("Maximum retries completed");
+    }
+```
+So, we have retries.
+The webhook request retries after failed deliveries after 1 second, 3 seconds, 9 seconds and make it work. 
+
+As we discussed, diving onto the Reciever App.
+Reciever App runs on : http://localhost:5000
+Its job is simple, check the incoming requests are genuine.
+
+```python
+import express from "express";
+import webhookRoutes from "./routes/webhookRoutes.js";
+
+const app = express();
+
+app.use(webhookRoutes);
+
+const PORT = 5000;
+
+app.listen(PORT, () => {
+  console.log(`Receiver running on port ${PORT}`);
+});
+```
+Similar to Sender side, here the reciever starts the server, sets up the routes and waits for the webhook requests.
+
+```python
+const router = express.Router();
+
+const SECRET = "mysecretkey";
+
+router.post(
+  "/webhook",
+  express.raw({ type: "application/json" }),
+  (req, res) => {
+    try {
+      const signature = req.headers["x-webhook-signature"];
+
+      const timestamp = req.headers["x-webhook-timestamp"];
+      if (!signature) {
+        return res.status(400).json({
+          message: "Missing signature",
+        });
+      }
+
+      if (!timestamp) {
+        return res.status(400).json({
+          message: "Missing timestamp",
+        });
+      }
+```
+When the router.post("/webhook") matches the incoming webhook request, the Reciever extracts the meta data sent by the Sender. Before verification it checks if signature and timestamp are existing in headers. 
+
+```python
+      const payload = `${timestamp}.${rawBody}`;
+
+      const expectedSignature = crypto
+        .createHmac("sha256", SECRET)
+        .update(payload)
+        .digest("hex");
+      if (signature !== expectedSignature) {
+        return res.status(401).json({
+          message: "Invalid signature",
+        });
+      }
+
+      const parsedData = JSON.parse(rawBody);
+
+      console.log("Verified Payload");
+      console.log(parsedData);
+
+      return res.status(200).json({
+        message: "Webhook verified successfully",
+      });
+    } catch (error) {
+      return res.status(500).json({
+        message: error.message,
+      });
+    }
+  },
+);
+```
+Now, the Reciever recreates the same payload like the Sender used because both Sender and Reciever should create signature from identical data otherwise verification fails. With that we create its own signature version from same data using HMAC as we discussed before. 
+
+So we then compare the signature coming from Sender with that of the Reciever, if it differs the webhook fails otherwise ITS SUCCESSFULL!!!!!
+Thus, we know the order created by Sender was valid and genuine.
