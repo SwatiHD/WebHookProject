@@ -364,3 +364,55 @@ After building this project, din't we start seeing the same exact patterns every
 For example, let's imagine Razorpay:
 The moment payment succeeds, the payment gateway immediately notify the application and the application knows : payment succeeded --> order can now be processed --> inventory should be updated --> Invoice can be generated --> Confirmation email can be sent.
 The payment provider need not keep asking the application about the status of the payment every minute. Instead, payment provider sends the webhook event immediately.
+
+
+# Prerequisites
+
+Before running this project, make sure you have:
+
+- Node.js installed
+- MongoDB installed and running locally
+- npm or yarn package manager
+- Postman or any API testing tool
+
+---
+
+# Installation
+
+Clone the repository:
+
+```bash
+git clone <repo-url>
+cd WebHookProject
+```
+
+Install dependencies for both sender and receiver applications:
+
+```bash
+npm init -y
+npm install express
+```
+
+Start MongoDB locally, then run:
+
+```bash
+cd/Sender 
+npm start
+```
+```bash
+cd/Reciever 
+npm start
+```
+---
+
+Sender runs on:
+
+```python
+http://localhost:4000
+```
+
+Receiver runs on:
+
+```python
+http://localhost:5000
+```
