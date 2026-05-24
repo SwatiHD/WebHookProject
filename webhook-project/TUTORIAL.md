@@ -325,7 +325,7 @@ The final flow:
 1. Reciever uses ```python
 express.raw({ type: "application/json" })
 ```
-Instead of ```python
+```python
 express.json()
 ```
 This preserves the body exactly as it arrived. Otherwise, they yield different strings, resulting in different signatures. This decision ensures accurate HMAC verification.
