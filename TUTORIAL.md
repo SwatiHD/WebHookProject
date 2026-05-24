@@ -32,14 +32,14 @@ So, A webhook is an HTTP request sent from one system to another when an event i
 
 In this Project:
 #Sender: creates Orders
-#Reciever: gets the notification about the order
+#Receiver: gets the notification about the order
 
 So we have two backend system 
 1. Sender
     --> creates orders
     --> stores them in MongoDB
     --> sends webhook events
-2. Reciever
+2. Receiver
     --> receives webhook requests
     --> verifies they are authentic
     --> accepts or rejects them
@@ -133,7 +133,7 @@ Yes, right after saving the order data, the webhook concept starts when the cont
 sendWebhook(newOrder);
 ```
 
-This tells the reciever App, that the new order is created.
+This tells the Receiver App, that the new order is created.
 
 Thus, we are here with the most important concept HMAC.
 
@@ -190,8 +190,8 @@ async function sendWebhook(orderData, retryCount = 0) {
 export default sendWebhook;
 ```
 
-So, by now we know, Sender sends the notification to the Reciever. But, what if it's a fake webhook request?? 
-How will the reciever know:
+So, by now we know, Sender sends the notification to the Receiver. But, what if it's a fake webhook request?? 
+How will the Receiver know:
 Who sent the request?
 Is the payload modified?
 If someone forged the request?
@@ -199,12 +199,12 @@ This is where HMAC authentication steps in.
 
 HMAC (Hash-Based Message Authentication Code) is a cryptographic technique that ensures data integrity and authenticity using a hash function and a secret key. The cryptographic hash function may be MD-5, SHA-1, or SHA-256.
 
-HMACs provides Sender and Reciever with a shared secret key that is known only to them. When the Sender requests the Reciever, it hashes the requested data with the secret key and sends it along the request. When the Sender receives the request, it makes its own HMAC. Both the HMACS are compared and if both are equal, the Sender is said to be genuine. 
+HMACs provides Sender and Receiver with a shared secret key that is known only to them. When the Sender requests the Receiver, it hashes the requested data with the secret key and sends it along the request. When the Sender receives the request, it makes its own HMAC. Both the HMACS are compared and if both are equal, the Sender is said to be genuine. 
 
 ```python
 const RECEIVER_URL = "http://localhost:5000/webhook";
 ```
-this is the reciever address where webhook events are delivered.
+this is the Receiver address where webhook events are delivered.
 
 
 ```python
@@ -248,8 +248,8 @@ No worries. We have the solution below:
 So, we have retries.
 The webhook request retries the failed deliveries after 1 second, 3 seconds, 9 seconds and make it work and making the system more reliable. 
 
-As we discussed, diving onto the Reciever App.
-Reciever App runs on : http://localhost:5000
+As we discussed, diving onto the Receiver App.
+Receiver App runs on : http://localhost:5000
 Its job is simple, check if the incoming requests are genuine.
 
 ```python
@@ -266,7 +266,7 @@ app.listen(PORT, () => {
   console.log(`Receiver running on port ${PORT}`);
 });
 ```
-Similar to Sender side, here the reciever starts the server, sets up the routes and waits for the webhook requests.
+Similar to Sender side, here the Receiver starts the server, sets up the routes and waits for the webhook requests.
 
 ```python
 const router = express.Router();
@@ -293,7 +293,7 @@ router.post(
         });
       }
 ```
-When the router.post("/webhook") matches the incoming webhook request, the Reciever extracts the meta data sent by the Sender. Before verification, it checks if signature and timestamp are existing in headers. If its present, goes to next line of code, otherwise returns missing message.
+When the router.post("/webhook") matches the incoming webhook request, the Receiver extracts the meta data sent by the Sender. Before verification, it checks if signature and timestamp are existing in headers. If its present, goes to next line of code, otherwise returns missing message.
 
 ```python
       const payload = `${timestamp}.${rawBody}`;
@@ -324,9 +324,9 @@ When the router.post("/webhook") matches the incoming webhook request, the Recie
   },
 );
 ```
-Now, the Reciever recreates the same payload like the Sender used because both Sender and Reciever should create signature from identical data otherwise verification fails.Because for different data the signature changes internally. With that we create Reciever's own signature version from same data using HMAC as we discussed before. 
+Now, the Receiver recreates the same payload like the Sender used because both Sender and Receiver should create signature from identical data otherwise verification fails.Because for different data the signature changes internally. With that we create Receiver's own signature version from same data using HMAC as we discussed before. 
 
-We then compare the signature coming from Sender with that of the Reciever, if it differs the webhook fails otherwise ITS SUCCESSFULL!!!!!
+We then compare the signature coming from Sender with that of the Receiver, if it differs the webhook fails otherwise ITS SUCCESSFULL!!!!!
 Thus, we know the order created by Sender is valid and genuine. And Warehouse can proceed with the delivery of the order.
 
 The final flow:
@@ -334,7 +334,7 @@ The final flow:
 
 #Key Implementation Decisions
 
-1. Reciever uses 
+1. Receiver uses 
 ```python
 express.raw({ type: "application/json" })
 ```
