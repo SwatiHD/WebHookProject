@@ -326,7 +326,7 @@ The final flow:
 ```python
 express.raw({ type: "application/json" })
 ```
-
+instead of
 ```python
 express.json()
 ```
@@ -344,3 +344,11 @@ const delays = [1000, 3000, 9000];
 ```
 We know real requests are unreliable. Server may crash because for several reasons. and we give up. To avoid this, project retries failed requests after 1 sec, 3 sec, 9 sec. This make the system more reliable.
 
+FINAL THOUGHTS
+==============
+
+After building this project, din't we start seeing the same exact patterns everywhere??
+
+For example, let's imagine Razorpay
+The moment payment succeeds, the payment gateway immediately notify the application and the application knows : payment succeeded --> order can now be processed --> inventory should be updated --> Invoice can be generated --> Confirmation email can be sent.
+The payment provider need not keep asking the application about the status of payment every minute. Instead, payment provider sends the webhook event immediately.
