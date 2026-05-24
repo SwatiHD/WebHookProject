@@ -17,6 +17,7 @@ By the end of this project, we will understand:
 -How webhook verification works?
 
 The problem we are solving with webhook:
+========================================
 Suppose, you have a online store. The customer drops an order. To deliver this order, the warehouse team should be aware of the order creation. So, they will keep guessing:
 -Is there any new order?
 -Is there any new order now?
@@ -24,7 +25,7 @@ Suppose, you have a online store. The customer drops an order. To deliver this o
 That's so inefficient!!!!
 
 Instead, the online store should send the notification to the warehouse team automatically, that order is created.
-That automatic notification is nothing but the WEBHOOK!!
+This automatic notification is nothing but the WEBHOOK!!
 Simple right??
 
 So, A webhook is an HTTP request sent from one system to another when an event is triggerred.
@@ -121,7 +122,7 @@ Without routes the Sender server exists but it's of no use.So, ain't we solving 
 -trigerring the notifications
 here?
 
-Yes, Right after saving the order data, the webhook concept starts when the control flow goes to the line ```python
+Yes, right after saving the order data, the webhook concept starts when the control flow goes to the line ```python
 sendWebhook(newOrder);
 ``` This tells the reciever App, that the new order is created.
 
@@ -215,7 +216,7 @@ Finding it interesting????.....
 Okay, lets move to the final part. You are just there!!
 
 Before that, lets see: what if the webhook request fails?
-We know the network issues, server crash,Connections timeout that creates failure in request-response cycle..so what do we do??
+We know the network issues, server crash,connections timeout that creates failure in request-response cycle..so what do we do??
 No worries. We have the solution below:
 
 ```python
@@ -234,7 +235,7 @@ No worries. We have the solution below:
     }
 ```
 So, we have retries.
-The webhook request retries the failed deliveries after 1 second, 3 seconds, 9 seconds and make it work. 
+The webhook request retries the failed deliveries after 1 second, 3 seconds, 9 seconds and make it work and making the system more reliable. 
 
 As we discussed, diving onto the Reciever App.
 Reciever App runs on : http://localhost:5000
@@ -281,7 +282,7 @@ router.post(
         });
       }
 ```
-When the router.post("/webhook") matches the incoming webhook request, the Reciever extracts the meta data sent by the Sender. Before verification it checks if signature and timestamp are existing in headers. If its present, goes to next step, otherwise returns missing message.
+When the router.post("/webhook") matches the incoming webhook request, the Reciever extracts the meta data sent by the Sender. Before verification it checks if signature and timestamp are existing in headers. If its present, goes to next line of code, otherwise returns missing message.
 
 ```python
       const payload = `${timestamp}.${rawBody}`;
@@ -349,6 +350,6 @@ FINAL THOUGHTS
 
 After building this project, din't we start seeing the same exact patterns everywhere??
 
-For example, let's imagine Razorpay
+For example, let's imagine Razorpay:
 The moment payment succeeds, the payment gateway immediately notify the application and the application knows : payment succeeded --> order can now be processed --> inventory should be updated --> Invoice can be generated --> Confirmation email can be sent.
-The payment provider need not keep asking the application about the status of payment every minute. Instead, payment provider sends the webhook event immediately.
+The payment provider need not keep asking the application about the status of the payment every minute. Instead, payment provider sends the webhook event immediately.
