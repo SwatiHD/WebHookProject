@@ -322,9 +322,11 @@ The final flow:
 
 #Key Implementation Decisions
 
-1. Reciever uses ```python
+1. Reciever uses 
+```python
 express.raw({ type: "application/json" })
 ```
+
 ```python
 express.json()
 ```
