@@ -320,3 +320,25 @@ Thus, we know the order created by Sender is valid and genuine. And Warehouse ca
 The final flow:
 ![Full Flow](FullFlow.png)
 
+#Key Implementation Decisions
+
+1. Reciever uses ```python
+express.raw({ type: "application/json" })
+```
+Instead of ```python
+express.json()
+```
+This preserves the body exactly as it arrived. Otherwise, they yield different strings, resulting in different signatures. This decision ensures accurate HMAC verification.
+
+2. Using Timestamps
+```python
+const timestamp = Math.floor(Date.now() / 1000);
+```
+Without timestamps webhook becomes vulnerable to replay attacks. When the attacker captures the real webhook request it can send it later any number of times. System thinks it's genuine and can process duplicate payments. That becomes dangerous. Timestamps avoid it.
+
+3. Using Retry logic
+```python
+const delays = [1000, 3000, 9000];
+```
+We know real requests are unreliable. Server may crash because for several reasons. and we give up. To avoid this, project retries failed requests after 1 sec, 3 sec, 9 sec. This make the system more reliable.
+
