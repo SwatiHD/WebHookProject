@@ -11,10 +11,10 @@ That's when I decided to build one!
 This project is the result of that.
 
 By the end of this project, we will understand:
--What webhooks really are?
--What is HMAC and why we use?
--How two backend systems work?
--How webhook verification works?
+What webhooks really are?
+What is HMAC and why we use?
+How two backend systems work?
+How webhook verification works?
 
 The problem we are solving with webhook:
 ========================================
