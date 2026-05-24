@@ -53,7 +53,7 @@ It's seems simple. But there are lot of interesting things happening inside.
 Let's dive into the code.
 
 Sender App is the root of the whole project.
-its runs on http://localhost:4000
+it runs on http://localhost:4000
 
 ```python
 import express from "express";
@@ -111,9 +111,12 @@ router.post("/orders", async (req, res) => {
 export default router;
 ```
 
-When we make a POST /order request from Postman,and if the path is matched with the    ```python
+When we make a POST /order request from Postman, and if the path is matched with the
+
+ ```python
 router.post("/order")
-```, the db values are extracted from req.body and document is created and saved in MongoDB.
+```
+the db values are extracted from req.body and document is created and saved in MongoDB.
 
 Here the router solves a huge problem:
 Without routes the Sender server exists but it's of no use.So, ain't we solving a problem by
@@ -181,9 +184,9 @@ export default sendWebhook;
 ```
 So, by now we know, Sender sends the notification to the Reciever. But, what if it's a fake webhook request?? 
 How will the reciever know:
--Who sent the request?
--Is the payload modified?
--if someone forged the request?
+Who sent the request?
+Is the payload modified?
+If someone forged the request?
 This is where HMAC authentication steps in.
 
 HMAC (Hash-Based Message Authentication Code) is a cryptographic technique that ensures data integrity and authenticity using a hash function and a secret key. The cryptographic hash function may be MD-5, SHA-1, or SHA-256.
@@ -282,7 +285,7 @@ router.post(
         });
       }
 ```
-When the router.post("/webhook") matches the incoming webhook request, the Reciever extracts the meta data sent by the Sender. Before verification it checks if signature and timestamp are existing in headers. If its present, goes to next line of code, otherwise returns missing message.
+When the router.post("/webhook") matches the incoming webhook request, the Reciever extracts the meta data sent by the Sender. Before verification, it checks if signature and timestamp are existing in headers. If its present, goes to next line of code, otherwise returns missing message.
 
 ```python
       const payload = `${timestamp}.${rawBody}`;
@@ -331,19 +334,19 @@ instead of
 ```python
 express.json()
 ```
-This preserves the body exactly as it arrived. Otherwise, they yield different strings, resulting in different signatures. This decision ensures accurate HMAC verification.
+This preserves the body exactly as it arrived. Otherwise, they yield different strings, resulting in different signatures and verification fails. So, using rawbody ensures accurate HMAC verification.
 
 2. Using Timestamps
 ```python
 const timestamp = Math.floor(Date.now() / 1000);
 ```
-Without timestamps webhook becomes vulnerable to replay attacks. When the attacker captures the real webhook request it can send it later any number of times. System thinks it's genuine and can process duplicate payments. That becomes dangerous. Timestamps avoid it.
+Without timestamp webhook becomes vulnerable to replay attacks. When the attacker captures the real webhook request it can send it later any number of times. System thinks it's genuine and can process duplicate payments. That becomes dangerous. Timestamp avoid it.
 
 3. Using Retry logic
 ```python
 const delays = [1000, 3000, 9000];
 ```
-We know real requests are unreliable. Server may crash because for several reasons. and we give up. To avoid this, project retries failed requests after 1 sec, 3 sec, 9 sec. This make the system more reliable.
+We know real requests are unreliable. Server may crash because of several reasons and we give up immediatly. To avoid this, project retries failed requests after 1 sec, 3 sec, 9 sec. This make the system more reliable.
 
 FINAL THOUGHTS
 ==============
