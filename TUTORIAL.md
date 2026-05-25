@@ -375,7 +375,7 @@ Before running this project, make sure you have:
 - npm or yarn package manager
 - Postman or any API testing tool
 
----
+----
 
 # Installation
 
@@ -403,7 +403,7 @@ npm start
 cd/Reciever 
 npm start
 ```
----
+----
 
 Sender runs on:
 
