@@ -13,7 +13,7 @@ router.post("/orders", async (req, res) => {
       status,
     });
 
-    sendWebhook(newOrder);
+    await sendWebhook(newOrder);
     res.status(201).json({
       message: "Order created",
       order: newOrder,
