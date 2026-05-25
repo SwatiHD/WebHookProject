@@ -1,14 +1,17 @@
 import axios from "axios";
 import crypto from "crypto";
 
-const SECRET = "mysecretkey";
+const SECRET = process.env.SECRET;
 
 const RECEIVER_URL = "http://localhost:5000/webhook";
 
 function generateSignature(timestamp, body) {
   const payload = `${timestamp}.${body}`;
 
-  return crypto.createHmac("sha256", SECRET).update(payload).digest("hex");
+  return crypto
+    .createHmac("sha256", process.env.SECRET)
+    .update(payload)
+    .digest("hex");
 }
 
 async function sendWebhook(orderData, retryCount = 0) {
@@ -30,6 +33,11 @@ async function sendWebhook(orderData, retryCount = 0) {
   } catch (error) {
     console.log("Webhook Failed");
 
+    if (error.response) {
+      console.log(error.response.data);
+    } else {
+      console.log(error.message);
+    }
     if (retryCount < 3) {
       const delays = [1000, 3000, 9000];
 

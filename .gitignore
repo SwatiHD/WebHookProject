@@ -1,6 +1,7 @@
 # Dependencies (never commit these)
 node_modules/
 bower_components/
+.env
 
 # Environment variables and secrets
 .env

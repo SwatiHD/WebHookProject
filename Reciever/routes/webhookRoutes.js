@@ -3,7 +3,7 @@ import crypto from "crypto";
 
 const router = express.Router();
 
-const SECRET = "mysecretkey";
+const SECRET = process.env.SECRET;
 
 router.post(
   "/webhook",
@@ -30,7 +30,7 @@ router.post(
       const payload = `${timestamp}.${rawBody}`;
 
       const expectedSignature = crypto
-        .createHmac("sha256", SECRET)
+        .createHmac("sha256", process.env.SECRET)
         .update(payload)
         .digest("hex");
       if (signature !== expectedSignature) {

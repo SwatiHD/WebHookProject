@@ -299,7 +299,7 @@ When the router.post("/webhook") matches the incoming webhook request, the Recei
       const payload = `${timestamp}.${rawBody}`;
 
       const expectedSignature = crypto
-        .createHmac("sha256", SECRET)
+        .createHmac("sha256", process.env.SECRET)
         .update(payload)
         .digest("hex");
       if (signature !== expectedSignature) {
@@ -404,6 +404,19 @@ cd/Reciever
 npm start
 ```
 ----
+
+Run 
+```bash
+http://localhost:4000/orders
+in Testing tool 
+with body
+{
+  "amount": 500,
+  "status": "pending"
+}
+and headers
+Content-Type:application/json
+```
 
 Sender runs on:
 
